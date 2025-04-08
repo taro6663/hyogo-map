@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>おでかけ兵庫MAP Viewer</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    #map {
+      height: 100vh;
+      width: 100%;
+    }
+    .gm-style-iw {
+      max-width: 250px;
+    }
+    body {
+      margin: 0;
+      font-family: sans-serif;
+    }
+  </style>
+</head>
+<body>
+  <div id="map"></div>
+
+  <script>
+    const mapData = [
+      {
+        name: "TRATTORIA Da GOINO",
+        lat: 34.7485368,
+        lng: 135.3560144,
+        genre: "イタリアン",
+        sns: "https://www.instagram.com/trattoriadagoino",
+        time: "11:30-14:30 / 18:00-22:00",
+      },
+      {
+        name: "LE66 PLATABLE",
+        lat: 34.7471158,
+        lng: 135.355855,
+        genre: "ビストロ",
+        sns: "https://www.instagram.com/le66platable",
+        time: "11:30-16:00 / 18:00-23:00",
+      },
+      {
+        name: "野菜ビストロ Les Legumes",
+        lat: 34.744621,
+        lng: 135.3569831,
+        genre: "ビストロ",
+        sns: "https://www.instagram.com/bistro_legumes",
+        time: "11:30-15:00 / 17:30-22:00",
+      },
+      {
+        name: "La Zucca di napoli",
+        lat: 34.7451855,
+        lng: 135.3617249,
+        genre: "イタリアン",
+        sns: "https://www.instagram.com/lazuccadi",
+        time: "11:30-15:00 / 18:00-24:00",
+      },
+      {
+        name: "Tokidoki slow coffee&wine therapy",
+        lat: 34.7423179,
+        lng: 135.3701901,
+        genre: "カフェ",
+        sns: "https://www.instagram.com/tokidoki_nishinomiya",
+        time: "9:30-17:00 / 18:00-21:00",
+      }
+    ];
+
+    let activeInfoWindow;
+
+    function initMap() {
+      const map = new google.maps.Map(document.getElementById("map"), {
+        zoom: 15,
+        center: { lat: 34.746, lng: 135.359 },
+      });
+
+      mapData.forEach(place => {
+        const marker = new google.maps.Marker({
+          position: { lat: place.lat, lng: place.lng },
+          map,
+          title: place.name,
+        });
+
+        const infoWindow = new google.maps.InfoWindow({
+          content: `<strong>${place.name}</strong><br>ジャンル: ${place.genre}<br>営業時間: ${place.time}<br><a href='${place.sns}' target='_blank' rel='noopener noreferrer'>Instagram</a>`
+        });
+
+        marker.addListener("click", () => {
+          if (activeInfoWindow) {
+            activeInfoWindow.close();
+          }
+          infoWindow.open(map, marker);
+          activeInfoWindow = infoWindow;
+        });
+      });
+    }
+  </script>
+
+  <!-- IMPORTANT: Be sure the Maps JavaScript API is ENABLED in your Google Cloud Console -->
+  <!-- Visit: https://console.cloud.google.com/apis/library/maps-backend.googleapis.com -->
+  <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCXxn4fLU6ns7JcbfxUAn9KFOA7ts86LBM&callback=initMap"></script>
+</body>
+</html>
