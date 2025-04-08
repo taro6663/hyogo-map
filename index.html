@@ -17,7 +17,7 @@
     }
     .map-controls {
       position: fixed;
-      bottom: 100px;
+      bottom: 160px;
       right: 16px;
       display: flex;
       flex-direction: column;
@@ -145,7 +145,7 @@
   <script>
     let map;
     let activeInfoWindow = null;
-    const markers = [];
+    let allMarkers = [];
 
     async function fetchData() {
       const url = "https://script.google.com/macros/s/AKfycbz3xbzE0YOGXqgLBMjmVofc1mx9Sg8Bp_N9e4SI4KBwM-ajf6SlCvJv2TwQEGvi5fA/exec";
@@ -168,7 +168,15 @@
         infoWindow.open(map, marker);
         activeInfoWindow = infoWindow;
       });
-      markers.push({ marker, place });
+      allMarkers.push({ marker, place });
+    }
+
+    function updateMarkerVisibility() {
+      const selectedGenres = Array.from(document.querySelectorAll('#genreCheckboxes input[type="checkbox"]:checked')).map(cb => cb.value);
+      allMarkers.forEach(({ marker, place }) => {
+        const genreMatch = selectedGenres.includes(place.ジャンル1) || selectedGenres.includes(place.ジャンル2) || selectedGenres.includes(place.ジャンル3);
+        marker.setVisible(genreMatch);
+      });
     }
 
     async function initMap() {
@@ -202,7 +210,12 @@
       document.querySelectorAll('#genreCheckboxes input[type="checkbox"]').forEach(cb => {
         cb.checked = flag;
       });
+      updateMarkerVisibility();
     }
+
+    document.querySelectorAll('#genreCheckboxes input[type="checkbox"]').forEach(cb => {
+      cb.addEventListener('change', updateMarkerVisibility);
+    });
 
     window.initMap = initMap;
   </script>
