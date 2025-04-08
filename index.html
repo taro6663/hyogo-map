@@ -77,14 +77,38 @@
       box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
       z-index: 1000;
       display: none;
+      max-height: 300px;
+      overflow-y: auto;
+    }
+    .filter-controls {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 8px;
+    }
+    .filter-controls button {
+      font-size: 12px;
+      padding: 4px 8px;
+      cursor: pointer;
+      background-color: #f0f0f0;
+      border: 1px solid #ccc;
+      border-radius: 4px;
     }
   </style>
 </head>
 <body>
   <div id="loading"><div class="loader"></div>現在、マップを読み込んでいます...</div>
   <div id="map"></div>
-  <button id="filter-button">🔽 フィルター</button>
-  <div id="filter-panel"></div>
+  <button id="filter-button">ジャンルから探す</button>
+  <div id="filter-panel">
+    <div class="filter-controls">
+      <button id="select-all">すべて選択</button>
+      <button id="deselect-all">選択解除</button>
+      <button id="favorite-only">
+        <img src="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/icons/star.svg" width="16" alt="お気に入り">
+        お気に入り
+      </button>
+    </div>
+  </div>
 
   <script>
     let activeInfoWindow;
@@ -117,6 +141,7 @@
           checkbox.type = "checkbox";
           checkbox.checked = true;
           checkbox.value = genre;
+          checkbox.className = "genre-check";
           checkbox.onchange = () => filterMarkers(mapData);
           label.appendChild(checkbox);
           label.append(" " + genre);
@@ -124,11 +149,21 @@
           filterPanel.appendChild(document.createElement("br"));
         });
 
+        document.getElementById("select-all").onclick = () => {
+          document.querySelectorAll('.genre-check').forEach(cb => cb.checked = true);
+          filterMarkers(mapData);
+        };
+
+        document.getElementById("deselect-all").onclick = () => {
+          document.querySelectorAll('.genre-check').forEach(cb => cb.checked = false);
+          filterMarkers(mapData);
+        };
+
         function filterMarkers(data) {
           allMarkers.forEach(m => m.setMap(null));
           allMarkers = [];
 
-          const checkedGenres = Array.from(filterPanel.querySelectorAll("input:checked")).map(c => c.value);
+          const checkedGenres = Array.from(document.querySelectorAll(".genre-check:checked")).map(c => c.value);
 
           data.forEach(place => {
             const genres = [place['ジャンル1'], place['ジャンル2'], place['ジャンル3']];
