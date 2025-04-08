@@ -37,6 +37,7 @@
         lat: 34.7485368,
         lng: 135.3560144,
         genre: "イタリアン",
+        access: "阪急西宮北口駅 徒歩6分",
         sns: "https://www.instagram.com/trattoriadagoino/",
         time: "11:30-14:30 / 18:00-22:00",
       },
@@ -45,6 +46,7 @@
         lat: 34.7471158,
         lng: 135.355855,
         genre: "ビストロ",
+        access: "阪急西宮北口駅 徒歩4分",
         sns: "https://www.instagram.com/le66platable/",
         time: "11:30-16:00 / 18:00-23:00",
       },
@@ -53,6 +55,7 @@
         lat: 34.744621,
         lng: 135.3569831,
         genre: "ビストロ",
+        access: "阪急西宮北口駅 徒歩4分",
         sns: "https://www.instagram.com/les_legumes/",
         time: "11:30-15:00 / 17:30-22:00",
       },
@@ -61,6 +64,7 @@
         lat: 34.7451855,
         lng: 135.3617249,
         genre: "イタリアン",
+        access: "阪急西宮北口駅 徒歩8分",
         sns: "https://www.instagram.com/lazuccadi/",
         time: "11:30-15:00 / 18:00-24:00",
       },
@@ -69,6 +73,7 @@
         lat: 34.7423179,
         lng: 135.3701901,
         genre: "カフェ",
+        access: "阪急西宮北口駅 徒歩1分（バス甲子園学院前）",
         sns: "https://www.instagram.com/tokidoki_nishinomiya/",
         time: "9:30-17:00 / 18:00-21:00",
       }
@@ -91,8 +96,8 @@
 
         const infoWindow = new google.maps.InfoWindow({
           content: `
-            <strong>🍽️ ${place.name}</strong><br>
-            ジャンル: ${place.genre}<br>
+            <strong>${place.name}</strong><br>
+            ${place.access}<br>
             営業時間: ${place.time}<br>
             <a href='${place.sns}' class='insta-link' target='_blank' rel='noopener noreferrer'>
               <img src='https://upload.wikimedia.org/wikipedia/commons/a/a5/Instagram_icon.png' alt='Instagram'>
