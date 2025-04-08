@@ -124,7 +124,7 @@
     const markers = [];
 
     async function fetchData() {
-      const url = "https://script.google.com/macros/s/AKfycbz3xbzE0YOGXqgLBMjmVofc1mx9Sg8Bp_N9e4SI4KBwM-ajf6SlCvJv2TwQEGvi5fA/exec?nocache=" + new Date().getTime();
+      const url = "https://script.google.com/macros/s/AKfycbz3xbzE0YOGXqgLBMjmVofc1mx9Sg8Bp_N9e4SI4KBwM-ajf6SlCvJv2TwQEGvi5fA/exec";
       const res = await fetch(url);
       const json = await res.json();
       return json.data || json;
