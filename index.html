@@ -31,65 +31,22 @@
   <div id="map"></div>
 
   <script>
-    const mapData = [
-      {
-        name: "TRATTORIA Da GOINO",
-        lat: 34.7485368,
-        lng: 135.3560144,
-        genre: "イタリアン",
-        access: "阪急西宮北口駅 徒歩6分",
-        sns: "https://www.instagram.com/trattoriadagoino/",
-        time: "11:30-14:30 / 18:00-22:00",
-      },
-      {
-        name: "LE66 PLATABLE",
-        lat: 34.7471158,
-        lng: 135.355855,
-        genre: "ビストロ",
-        access: "阪急西宮北口駅 徒歩4分",
-        sns: "https://www.instagram.com/le66platable/",
-        time: "11:30-16:00 / 18:00-23:00",
-      },
-      {
-        name: "野菜ビストロ Les Legumes",
-        lat: 34.744621,
-        lng: 135.3569831,
-        genre: "ビストロ",
-        access: "阪急西宮北口駅 徒歩4分",
-        sns: "https://www.instagram.com/les_legumes/",
-        time: "11:30-15:00 / 17:30-22:00",
-      },
-      {
-        name: "La Zucca di napoli",
-        lat: 34.7451855,
-        lng: 135.3617249,
-        genre: "イタリアン",
-        access: "阪急西宮北口駅 徒歩8分",
-        sns: "https://www.instagram.com/lazuccadi/",
-        time: "11:30-15:00 / 18:00-24:00",
-      },
-      {
-        name: "Tokidoki slow coffee&wine therapy",
-        lat: 34.7423179,
-        lng: 135.3701901,
-        genre: "カフェ",
-        access: "阪急西宮北口駅 徒歩1分（バス甲子園学院前）",
-        sns: "https://www.instagram.com/tokidoki_nishinomiya/",
-        time: "9:30-17:00 / 18:00-21:00",
-      }
-    ];
-
     let activeInfoWindow;
 
-    function initMap() {
+    async function initMap() {
       const map = new google.maps.Map(document.getElementById("map"), {
         zoom: 15,
         center: { lat: 34.746, lng: 135.359 },
       });
 
+      const response = await fetch("https://script.google.com/macros/s/AKfycbw0Q-YEkBPQ3v6lMiFKOjIDy9wGwqQpWTsXZvQd_z6qM-z4EfCXH69Ds5m8CvsI-fI1/exec");
+      const mapData = await response.json();
+
       mapData.forEach(place => {
+        if (!place.lat || !place.lng) return;
+
         const marker = new google.maps.Marker({
-          position: { lat: place.lat, lng: place.lng },
+          position: { lat: parseFloat(place.lat), lng: parseFloat(place.lng) },
           map,
           title: place.name,
         });
