@@ -1,4 +1,164 @@
-<script>
+<!DOCTYPE html>
+<html>
+<head>
+  <title>おでかけ兵庫MAP Viewer</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    body, html {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      font-family: sans-serif;
+    }
+    #map {
+      height: 100%;
+      width: 100%;
+    }
+    .loading-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(255, 255, 255, 0.8);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      z-index: 9999;
+      font-size: 1.2rem;
+    }
+    .spinner {
+      border: 4px solid #f3f3f3;
+      border-top: 4px solid #333;
+      border-radius: 50%;
+      width: 24px;
+      height: 24px;
+      animation: spin 1s linear infinite;
+      margin-bottom: 10px;
+    }
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    .map-controls {
+      position: fixed;
+      bottom: 100px;
+      right: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      z-index: 1000;
+    }
+    .map-controls button {
+      background: white;
+      border: none;
+      border-radius: 50%;
+      width: 56px;
+      height: 56px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.2s;
+    }
+    .map-controls button:hover {
+      background: #f0f0f0;
+    }
+    .map-controls svg {
+      width: 28px;
+      height: 28px;
+      fill: #333;
+      vertical-align: middle;
+    }
+    .filter-panel {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: white;
+      padding: 16px 20px 20px;
+      border-radius: 12px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+      z-index: 2000;
+      display: none;
+      min-width: 280px;
+      max-width: 90%;
+    }
+    .filter-panel h3 {
+      margin: 0 0 12px;
+      font-size: 1rem;
+    }
+    .filter-panel label {
+      display: block;
+      margin-bottom: 8px;
+    }
+    .filter-panel input[type="checkbox"] {
+      accent-color: black;
+    }
+    .filter-panel .actions {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 12px;
+    }
+    .filter-panel .close-btn {
+      position: absolute;
+      top: 8px;
+      right: 10px;
+      background: transparent;
+      border: none;
+      font-size: 18px;
+      cursor: pointer;
+    }
+    @media (max-width: 600px) {
+      .map-controls {
+        bottom: 140px;
+        gap: 20px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div id="map"></div>
+  <div class="loading-overlay" id="loading">
+    <div class="spinner"></div>
+    <span>マップを読み込んでいます...</span>
+  </div>
+
+  <div class="map-controls">
+    <button id="locateBtn" title="現在地">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16"><path d="M8 16s6-5.686 6-10A6 6 0 0 0 2 6c0 4.314 6 10 6 10zm0-7a3 3 0 1 1 0-6 3 3 0 0 1 0 6z"/></svg>
+    </button>
+    <button id="genreBtn" title="ジャンルで探す">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16"><path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85zm-5.242.656a5 5 0 1 1 0-10 5 5 0 0 1 0 10z"/></svg>
+    </button>
+    <button id="areaBtn" title="エリアで探す">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16"><path d="M9.5 0a.5.5 0 0 1 .5.5v1.61l3.61.909a.5.5 0 0 1 .39.49v11.903a.5.5 0 0 1-.683.474L10 13.118l-5.317 1.856A.5.5 0 0 1 4 14.5V1.118a.5.5 0 0 1 .683-.474L9 1.882V.5a.5.5 0 0 1 .5-.5z"/></svg>
+    </button>
+    <button id="sceneBtn" title="シーンで探す">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16"><path d="M8 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm4-3a4 4 0 1 1-8 0 4 4 0 0 1 8 0z"/><path d="M14 14s-1-1.5-6-1.5S2 14 2 14v1h12v-1z"/></svg>
+    </button>
+  </div>
+
+  <div id="areaFilterPanel" class="filter-panel">
+    <button class="close-btn" onclick="document.getElementById('areaFilterPanel').style.display='none'">×</button>
+    <h3>エリアからお店を探す</h3>
+    <div class="actions">
+      <button onclick="selectAllAreas(true)">すべて選択</button>
+      <button onclick="selectAllAreas(false)">選択解除</button>
+    </div>
+    <div id="areaCheckboxes">
+      <label><input type="checkbox" value="阪急" checked> 阪急</label>
+      <label><input type="checkbox" value="JR" checked> JR</label>
+      <hr>
+      <label><input type="checkbox" value="西宮" checked> 西宮</label>
+      <label><input type="checkbox" value="三宮" checked> 三宮</label>
+      <label><input type="checkbox" value="明石" checked> 明石</label>
+    </div>
+  </div>
+
+  <script>
     let map;
     let markers = [];
     async function fetchData() {
@@ -56,3 +216,5 @@
     });
     window.initMap = initMap;
 </script>
+</body>
+</html>
