@@ -54,26 +54,19 @@
     <button id="locateBtn" title="現在地">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16"><path d="M8 16s6-5.686 6-10A6 6 0 0 0 2 6c0 4.314 6 10 6 10zm0-7a3 3 0 1 1 0-6 3 3 0 0 1 0 6z"/></svg>
     </button>
-    <button id="genreBtn" title="ジャンルで探す">
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16"><path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85zm-5.242.656a5 5 0 1 1 0-10 5 5 0 0 1 0 10z"/></svg>
-    </button>
-    <button id="areaBtn" title="エリアで探す">
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16"><path d="M9.5 0a.5.5 0 0 1 .5.5v1.61l3.61.909a.5.5 0 0 1 .39.49v11.903a.5.5 0 0 1-.683.474L10 13.118l-5.317 1.856A.5.5 0 0 1 4 14.5V1.118a.5.5 0 0 1 .683-.474L9 1.882V.5a.5.5 0 0 1 .5-.5z"/></svg>
-    </button>
-    <button id="sceneBtn" title="シーンで探す">
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16"><path d="M8 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm4-3a4 4 0 1 1-8 0 4 4 0 0 1 8 0z"/><path d="M14 14s-1-1.5-6-1.5S2 14 2 14v1h12v-1z"/></svg>
-    </button>
   </div>
 
   <script>
     let map;
     let activeInfoWindow = null;
     const markers = [];
+
     async function fetchData() {
       const res = await fetch("https://script.google.com/macros/s/AKfycbwJNFpp9H0C6U2E1-Q51ysBZQciBded-DVcMZWa5bgqLyx7P3JKVLRarGJkwxnOo-hy/exec");
       const json = await res.json();
       return json.data || json;
     }
+
     function createMarker(place) {
       const marker = new google.maps.Marker({
         position: { lat: parseFloat(place.緯度), lng: parseFloat(place.経度) },
@@ -90,16 +83,19 @@
       });
       markers.push(marker);
     }
+
     async function initMap() {
       map = new google.maps.Map(document.getElementById("map"), {
         zoom: 14,
         center: { lat: 34.746, lng: 135.359 },
       });
+
       const data = await fetchData();
       data.forEach(place => {
         if (place.緯度 && place.経度) createMarker(place);
       });
     }
+
     document.getElementById("locateBtn").addEventListener("click", () => {
       if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(pos => {
@@ -107,12 +103,9 @@
         });
       }
     });
+
     window.initMap = initMap;
   </script>
-  <!-- Google Maps API を読み込み -->
-<script
-  src="https://maps.googleapis.com/maps/api/js?key=AIzaSyA9D6EXAMPLEz6k3HvUQPaEXAMPLEABCdFg&callback=initMap"
-  async defer>
-</script>
+  <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyD6gmB_kwOmJ1B5STIBdMQMIuBY2BmGLxw&callback=initMap" async defer></script>
 </body>
 </html>
