@@ -55,10 +55,10 @@
     }
     .floating-buttons {
       position: fixed;
-      bottom: 100px;
+      bottom: 20px;
       right: 20px;
       display: flex;
-      flex-direction: column;
+      flex-direction: column-reverse;
       gap: 12px;
       z-index: 1000;
     }
@@ -127,25 +127,22 @@
     <button class="circle-button" title="現在地">
       <img src="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/icons/geo-alt.svg" alt="現在地">
     </button>
-    <button class="circle-button" id="filter-button" title="ジャンルで探す">
+    <button class="circle-button" title="ジャンルで探す" id="filter-button">
       <img src="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/icons/search.svg" alt="ジャンル検索">
-    </button>
-    <button class="circle-button" title="シーンで探す">
-      <img src="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/icons/star.svg" alt="シーン検索">
     </button>
     <button class="circle-button" title="エリアで探す">
       <img src="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/icons/map.svg" alt="エリア検索">
     </button>
+    <button class="circle-button" title="シーンで探す">
+      <img src="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/icons/person.svg" alt="シーン検索">
+    </button>
   </div>
 
   <div id="filter-panel">
+    <h4 style="margin-top: 0; font-size: 14px; text-align: center;">ジャンルからお店を探す</h4>
     <div class="filter-controls">
       <button id="select-all">すべて選択</button>
       <button id="deselect-all">選択解除</button>
-      <button id="favorite-only">
-        <img src="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/icons/star.svg" width="16" alt="お気に入り">
-        お気に入り
-      </button>
     </div>
   </div>
 
@@ -173,8 +170,10 @@
           [p['ジャンル1'], p['ジャンル2'], p['ジャンル3']].forEach(j => j && genreSet.add(j));
         });
 
+        const genreList = Array.from(genreSet).sort();
+
         const filterPanel = document.getElementById("filter-panel");
-        genreSet.forEach(genre => {
+        genreList.forEach(genre => {
           const label = document.createElement("label");
           const checkbox = document.createElement("input");
           checkbox.type = "checkbox";
