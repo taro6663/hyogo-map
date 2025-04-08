@@ -105,7 +105,7 @@
         title: place.店名,
       });
       const infoWindow = new google.maps.InfoWindow({
-        content: `<strong>${place.店名}</strong><br>${place.アクセス}<br>営業時間: ${place.営業時間}<br><a href='${place["SNSリンク"]}' target='_blank'><img src='https://upload.wikimedia.org/wikipedia/commons/a/a5/Instagram_icon.png' alt='Instagram' width='16' height='16' style='vertical-align:middle; margin-right:4px;'>Instagram</a>`
+        content: `<strong>${place.店名}</strong><br>${place.アクセス}<br>営業時間: ${place.営業時間}<br><a href='${place["SNSリンク"]}' target='_blank'><img src='https://simpleicons.org/icons/instagram.svg' alt='Instagram' width='16' height='16' style='vertical-align:middle; margin-right:4px; filter: grayscale(100%);'>Instagram</a>`
       });
       marker.addListener("click", () => {
         if (activeInfoWindow) activeInfoWindow.close();
