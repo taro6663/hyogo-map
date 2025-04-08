@@ -51,9 +51,40 @@
       background: #f0f0f0;
     }
     .map-controls svg {
-      width: 24px;
-      height: 24px;
+      width: 28px;
+      height: 28px;
       fill: #333;
+      vertical-align: middle;
+    }
+    .filter-panel {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: white;
+      padding: 16px;
+      border-radius: 12px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+      z-index: 2000;
+      display: none;
+      min-width: 260px;
+      max-width: 90%;
+    }
+    .filter-panel h3 {
+      margin-top: 0;
+      font-size: 1rem;
+    }
+    .filter-panel label {
+      display: block;
+      margin-bottom: 8px;
+    }
+    .filter-panel input[type="checkbox"] {
+      accent-color: black;
+    }
+    .filter-panel .actions {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 12px;
     }
     @media (max-width: 600px) {
       .map-controls {
@@ -69,39 +100,51 @@
 
   <div class="map-controls">
     <button id="locateBtn" title="現在地">
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" class="bi bi-geo-alt">
-        <path d="M8 16s6-5.686 6-10A6 6 0 0 0 2 6c0 4.314 6 10 6 10zm0-7a3 3 0 1 1 0-6 3 3 0 0 1 0 6z"/>
-      </svg>
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16"><path d="M8 16s6-5.686 6-10A6 6 0 0 0 2 6c0 4.314 6 10 6 10zm0-7a3 3 0 1 1 0-6 3 3 0 0 1 0 6z"/></svg>
     </button>
     <button id="genreBtn" title="ジャンルで探す">
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" class="bi bi-search">
-        <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85zm-5.242.656a5 5 0 1 1 0-10 5 5 0 0 1 0 10z"/>
-      </svg>
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16"><path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85zm-5.242.656a5 5 0 1 1 0-10 5 5 0 0 1 0 10z"/></svg>
     </button>
     <button id="areaBtn" title="エリアで探す">
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" class="bi bi-map">
-        <path d="M15.817.113A.5.5 0 0 1 16 .5v14a.5.5 0 0 1-.683.474L10 13.118l-5.317 1.856A.5.5 0 0 1 4 14.5V1.118L9.317.262a.5.5 0 0 1 .366 0l6.134 2.12zM10 1.882 5 3.618v10.5l5-1.736V1.882zm1 0v10.5l4 1.382V2.264L11 1.882z"/>
-      </svg>
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16"><path d="M15.817.113A.5.5 0 0 1 16 .5v14a.5.5 0 0 1-.683.474L10 13.118l-5.317 1.856A.5.5 0 0 1 4 14.5V1.118L9.317.262a.5.5 0 0 1 .366 0l6.134 2.12zM10 1.882 5 3.618v10.5l5-1.736V1.882zm1 0v10.5l4 1.382V2.264L11 1.882z"/></svg>
     </button>
     <button id="sceneBtn" title="シーンで探す">
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" class="bi bi-person">
-        <path d="M8 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm4-3a4 4 0 1 1-8 0 4 4 0 0 1 8 0z"/>
-        <path d="M14 14s-1-1.5-6-1.5S2 14 2 14v1h12v-1z"/>
-      </svg>
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16"><path d="M8 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm4-3a4 4 0 1 1-8 0 4 4 0 0 1 8 0z"/><path d="M14 14s-1-1.5-6-1.5S2 14 2 14v1h12v-1z"/></svg>
     </button>
   </div>
 
+  <div id="filterPanel" class="filter-panel">
+    <h3>ジャンルからお店を探す</h3>
+    <div class="actions">
+      <button onclick="selectAllGenres(true)">すべて選択</button>
+      <button onclick="selectAllGenres(false)">選択解除</button>
+    </div>
+    <div id="genreCheckboxes">
+      <label><input type="checkbox" value="イタリアン" checked> イタリアン</label>
+      <label><input type="checkbox" value="カフェ" checked> カフェ</label>
+      <label><input type="checkbox" value="ビストロ" checked> ビストロ</label>
+    </div>
+  </div>
+
   <script>
+    function selectAllGenres(flag) {
+      document.querySelectorAll('#genreCheckboxes input[type="checkbox"]').forEach(cb => {
+        cb.checked = flag;
+      });
+    }
+
+    document.getElementById("genreBtn").addEventListener("click", () => {
+      const panel = document.getElementById("filterPanel");
+      panel.style.display = panel.style.display === "block" ? "none" : "block";
+    });
+
     let map;
     let markers = [];
-    let mapData = [];
-
     async function fetchData() {
       const res = await fetch("https://script.google.com/macros/s/AKfycbwJNFpp9H0C6U2E1-Q51ysBZQciBded-DVcMZWa5bgqLyx7P3JKVLRarGJkwxnOo-hy/exec");
       const json = await res.json();
       return json;
     }
-
     function createMarker(place) {
       const marker = new google.maps.Marker({
         position: { lat: parseFloat(place.緯度), lng: parseFloat(place.経度) },
@@ -116,24 +159,20 @@
       });
       markers.push(marker);
     }
-
     async function initMap() {
       map = new google.maps.Map(document.getElementById("map"), {
         zoom: 14,
         center: { lat: 34.746, lng: 135.359 },
       });
-
       const rawData = await fetchData();
-      mapData = rawData.data || rawData;
-      mapData.forEach(place => {
+      const data = rawData.data || rawData;
+      data.forEach(place => {
         if (place.緯度 && place.経度) {
           createMarker(place);
         }
       });
-
       document.getElementById("loading").style.display = "none";
     }
-
     document.getElementById("locateBtn").addEventListener("click", () => {
       if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(pos => {
@@ -145,7 +184,6 @@
         });
       }
     });
-
     window.initMap = initMap;
   </script>
   <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCXxn4fLU6ns7JcbfxUAn9KFOA7ts86LBM&callback=initMap"></script>
