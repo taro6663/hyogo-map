@@ -126,19 +126,22 @@
     <button id="genreBtn" title="ジャンルで探す">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16"><path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85zm-5.242.656a5 5 0 1 1 0-10 5 5 0 0 1 0 10z"/></svg>
     </button>
+    <button id="areaBtn" title="地域で探す">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16"><path d="M9.5 0a.5.5 0 0 1 .5.5v1.61l3.61.909a.5.5 0 0 1 .39.49v11.903a.5.5 0 0 1-.683.474L10 13.118l-5.317 1.856A.5.5 0 0 1 4 14.5V1.118a.5.5 0 0 1 .683-.474L9 1.882V.5a.5.5 0 0 1 .5-.5z"/></svg>
+    </button>
   </div>
 
-  <div id="genreFilterPanel" class="filter-panel">
-    <button class="close-btn" onclick="document.getElementById('genreFilterPanel').style.display='none'">×</button>
-    <h3>ジャンルからお店を探す</h3>
+  <div id="areaFilterPanel" class="filter-panel">
+    <button class="close-btn" onclick="document.getElementById('areaFilterPanel').style.display='none'">×</button>
+    <h3>地域からお店を探す</h3>
     <div class="actions">
-      <button onclick="selectAllGenres(true)">すべて選択</button>
-      <button onclick="selectAllGenres(false)">選択解除</button>
+      <button onclick="selectAllAreas(true)">すべて選択</button>
+      <button onclick="selectAllAreas(false)">選択解除</button>
     </div>
-    <div id="genreCheckboxes">
-      <label><input type="checkbox" value="イタリアン" checked> イタリアン</label>
-      <label><input type="checkbox" value="ビストロ" checked> ビストロ</label>
-      <label><input type="checkbox" value="カフェ" checked> カフェ</label>
+    <div id="areaCheckboxes">
+      <label><input type="checkbox" value="西宮北口" checked> 西宮北口</label>
+      <label><input type="checkbox" value="三宮" checked> 三宮</label>
+      <label><input type="checkbox" value="明石" checked> 明石</label>
     </div>
   </div>
 
@@ -173,9 +176,12 @@
 
     function updateMarkerVisibility() {
       const selectedGenres = Array.from(document.querySelectorAll('#genreCheckboxes input[type="checkbox"]:checked')).map(cb => cb.value);
+      const selectedAreas = Array.from(document.querySelectorAll('#areaCheckboxes input[type="checkbox"]:checked')).map(cb => cb.value);
+
       allMarkers.forEach(({ marker, place }) => {
         const genreMatch = selectedGenres.includes(place.ジャンル1) || selectedGenres.includes(place.ジャンル2) || selectedGenres.includes(place.ジャンル3);
-        marker.setVisible(genreMatch);
+        const areaMatch = selectedAreas.includes(place.最寄り駅);
+        marker.setVisible(genreMatch && areaMatch);
       });
     }
 
@@ -201,22 +207,17 @@
       }
     });
 
-    document.getElementById("genreBtn").addEventListener("click", () => {
-      const panel = document.getElementById("genreFilterPanel");
+    document.getElementById("areaBtn").addEventListener("click", () => {
+      const panel = document.getElementById("areaFilterPanel");
       panel.style.display = panel.style.display === "block" ? "none" : "block";
     });
 
-    function selectAllGenres(flag) {
-      document.querySelectorAll('#genreCheckboxes input[type="checkbox"]').forEach(cb => {
+    function selectAllAreas(flag) {
+      document.querySelectorAll('#areaCheckboxes input[type="checkbox"]').forEach(cb => {
         cb.checked = flag;
       });
       updateMarkerVisibility();
     }
-
-    document.querySelectorAll('#genreCheckboxes input[type="checkbox"]').forEach(cb => {
-      cb.addEventListener('change', updateMarkerVisibility);
-    });
-
     window.initMap = initMap;
   </script>
   <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyD6gmB_kwOmJ1B5STIBdMQMIuBY2BmGLxw&callback=initMap" async defer></script>
