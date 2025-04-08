@@ -53,14 +53,47 @@
       0% { transform: rotate(0deg); }
       100% { transform: rotate(360deg); }
     }
+    #filter-button {
+      position: absolute;
+      top: 15px;
+      right: 15px;
+      z-index: 1000;
+      background-color: white;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      padding: 8px 12px;
+      font-size: 14px;
+      cursor: pointer;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+    }
+    #filter-panel {
+      position: absolute;
+      top: 55px;
+      right: 15px;
+      background: white;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      padding: 10px;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+      z-index: 1000;
+      display: none;
+    }
   </style>
 </head>
 <body>
   <div id="loading"><div class="loader"></div>現在、マップを読み込んでいます...</div>
   <div id="map"></div>
+  <button id="filter-button">🔽 フィルター</button>
+  <div id="filter-panel"></div>
 
   <script>
     let activeInfoWindow;
+    let allMarkers = [];
+
+    document.getElementById('filter-button').onclick = () => {
+      const panel = document.getElementById('filter-panel');
+      panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
+    };
 
     async function initMap() {
       const map = new google.maps.Map(document.getElementById("map"), {
@@ -72,35 +105,66 @@
         const response = await fetch("https://script.google.com/macros/s/AKfycbwJNFpp9H0C6U2E1-Q51ysBZQciBded-DVcMZWa5bgqLyx7P3JKVLRarGJkwxnOo-hy/exec");
         const mapData = await response.json();
 
-        mapData.forEach(place => {
-          if (!place.緯度 || !place.経度) return;
-
-          const marker = new google.maps.Marker({
-            position: { lat: parseFloat(place.緯度), lng: parseFloat(place.経度) },
-            map,
-            title: place.店名,
-          });
-
-          const infoWindow = new google.maps.InfoWindow({
-            content: `
-              <strong>${place.店名}</strong><br>
-              ${place.アクセス}<br>
-              営業時間: ${place.営業時間}<br>
-              <a href='${place["SNSリンク"]}' class='insta-link' target='_blank' rel='noopener noreferrer'>
-                <img src='https://upload.wikimedia.org/wikipedia/commons/a/a5/Instagram_icon.png' alt='Instagram'>
-                Instagram
-              </a>
-            `
-          });
-
-          marker.addListener("click", () => {
-            if (activeInfoWindow) {
-              activeInfoWindow.close();
-            }
-            infoWindow.open(map, marker);
-            activeInfoWindow = infoWindow;
-          });
+        const genreSet = new Set();
+        mapData.forEach(p => {
+          [p['ジャンル1'], p['ジャンル2'], p['ジャンル3']].forEach(j => j && genreSet.add(j));
         });
+
+        const filterPanel = document.getElementById("filter-panel");
+        genreSet.forEach(genre => {
+          const label = document.createElement("label");
+          const checkbox = document.createElement("input");
+          checkbox.type = "checkbox";
+          checkbox.checked = true;
+          checkbox.value = genre;
+          checkbox.onchange = () => filterMarkers(mapData);
+          label.appendChild(checkbox);
+          label.append(" " + genre);
+          filterPanel.appendChild(label);
+          filterPanel.appendChild(document.createElement("br"));
+        });
+
+        function filterMarkers(data) {
+          allMarkers.forEach(m => m.setMap(null));
+          allMarkers = [];
+
+          const checkedGenres = Array.from(filterPanel.querySelectorAll("input:checked")).map(c => c.value);
+
+          data.forEach(place => {
+            const genres = [place['ジャンル1'], place['ジャンル2'], place['ジャンル3']];
+            if (!place.緯度 || !place.経度 || !genres.some(g => checkedGenres.includes(g))) return;
+
+            const marker = new google.maps.Marker({
+              position: { lat: parseFloat(place.緯度), lng: parseFloat(place.経度) },
+              map,
+              title: place.店名,
+            });
+
+            const infoWindow = new google.maps.InfoWindow({
+              content: `
+                <strong>${place.店名}</strong><br>
+                ${place.アクセス}<br>
+                営業時間: ${place.営業時間}<br>
+                <a href='${place["SNSリンク"]}' class='insta-link' target='_blank' rel='noopener noreferrer'>
+                  <img src='https://upload.wikimedia.org/wikipedia/commons/a/a5/Instagram_icon.png' alt='Instagram'>
+                  Instagram
+                </a>
+              `
+            });
+
+            marker.addListener("click", () => {
+              if (activeInfoWindow) {
+                activeInfoWindow.close();
+              }
+              infoWindow.open(map, marker);
+              activeInfoWindow = infoWindow;
+            });
+
+            allMarkers.push(marker);
+          });
+        }
+
+        filterMarkers(mapData);
       } catch (error) {
         console.error("マップデータ取得エラー:", error);
       } finally {
