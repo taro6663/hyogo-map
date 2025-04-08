@@ -131,6 +131,20 @@
     </button>
   </div>
 
+  <div id="genreFilterPanel" class="filter-panel">
+    <button class="close-btn" onclick="document.getElementById('genreFilterPanel').style.display='none'">×</button>
+    <h3>ジャンルからお店を探す</h3>
+    <div class="actions">
+      <button onclick="selectAllGenres(true)">すべて選択</button>
+      <button onclick="selectAllGenres(false)">選択解除</button>
+    </div>
+    <div id="genreCheckboxes">
+      <label><input type="checkbox" value="イタリアン" checked> イタリアン</label>
+      <label><input type="checkbox" value="ビストロ" checked> ビストロ</label>
+      <label><input type="checkbox" value="カフェ" checked> カフェ</label>
+    </div>
+  </div>
+
   <div id="areaFilterPanel" class="filter-panel">
     <button class="close-btn" onclick="document.getElementById('areaFilterPanel').style.display='none'">×</button>
     <h3>地域からお店を探す</h3>
@@ -212,12 +226,29 @@
       panel.style.display = panel.style.display === "block" ? "none" : "block";
     });
 
+    document.getElementById("genreBtn").addEventListener("click", () => {
+      const panel = document.getElementById("genreFilterPanel");
+      panel.style.display = panel.style.display === "block" ? "none" : "block";
+    });
+
     function selectAllAreas(flag) {
       document.querySelectorAll('#areaCheckboxes input[type="checkbox"]').forEach(cb => {
         cb.checked = flag;
       });
       updateMarkerVisibility();
     }
+
+    function selectAllGenres(flag) {
+      document.querySelectorAll('#genreCheckboxes input[type="checkbox"]').forEach(cb => {
+        cb.checked = flag;
+      });
+      updateMarkerVisibility();
+    }
+
+    document.querySelectorAll('#genreCheckboxes input[type="checkbox"], #areaCheckboxes input[type="checkbox"]').forEach(cb => {
+      cb.addEventListener('change', updateMarkerVisibility);
+    });
+
     window.initMap = initMap;
   </script>
   <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyD6gmB_kwOmJ1B5STIBdMQMIuBY2BmGLxw&callback=initMap" async defer></script>
