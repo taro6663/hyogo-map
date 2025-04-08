@@ -1,250 +1,138 @@
 <!DOCTYPE html>
-<html>
+<html lang="ja">
 <head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>おでかけ兵庫MAP Viewer</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
   <style>
-    #map {
-      height: 100vh;
-      width: 100%;
-    }
-    .gm-style-iw {
-      max-width: 250px;
-    }
-    body {
+    html, body {
+      height: 100%;
       margin: 0;
       font-family: sans-serif;
     }
-    .insta-link {
-      display: inline-flex;
-      align-items: center;
-      gap: 4px;
-      margin-top: 4px;
+    #map {
+      height: 100%;
+      width: 100%;
     }
-    .insta-link img {
-      width: 16px;
-      height: 16px;
-    }
-    #loading {
+    .loader {
       position: fixed;
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
-      background: rgba(255, 255, 255, 0.95);
-      padding: 15px 25px;
-      border-radius: 10px;
-      box-shadow: 0 0 10px rgba(0,0,0,0.2);
-      z-index: 999;
-      font-weight: bold;
-      font-size: 1.1em;
       display: flex;
+      flex-direction: column;
       align-items: center;
-      gap: 10px;
+      z-index: 1000;
     }
-    .loader {
-      border: 4px solid #ccc;
-      border-top: 4px solid #333;
+    .spinner {
+      border: 4px solid #f3f3f3;
+      border-top: 4px solid #555;
       border-radius: 50%;
-      width: 20px;
-      height: 20px;
+      width: 36px;
+      height: 36px;
       animation: spin 1s linear infinite;
+      margin-bottom: 10px;
     }
     @keyframes spin {
       0% { transform: rotate(0deg); }
       100% { transform: rotate(360deg); }
     }
-    .floating-buttons {
+    .filter-panel {
+      position: fixed;
+      bottom: 100px;
+      right: 20px;
+      background: #fff;
+      padding: 16px;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      z-index: 1000;
+      width: 220px;
+    }
+    .filter-panel h3 {
+      margin-top: 0;
+      font-size: 16px;
+    }
+    .filter-panel label {
+      display: flex;
+      align-items: center;
+      margin: 6px 0;
+    }
+    .filter-panel input[type="checkbox"] {
+      margin-right: 8px;
+      width: 18px;
+      height: 18px;
+    }
+    .filter-actions {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 8px;
+    }
+    .filter-actions button {
+      background: none;
+      border: 1px solid #ccc;
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-size: 12px;
+      cursor: pointer;
+    }
+    .control-buttons {
       position: fixed;
       bottom: 20px;
       right: 20px;
       display: flex;
-      flex-direction: column-reverse;
+      flex-direction: column;
       gap: 12px;
       z-index: 1000;
     }
-    .circle-button {
-      width: 48px;
-      height: 48px;
+    .control-button {
+      background: #fff;
       border-radius: 50%;
-      border: none;
-      background-color: white;
-      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+      box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+      width: 44px;
+      height: 44px;
       display: flex;
       align-items: center;
       justify-content: center;
       cursor: pointer;
     }
-    .circle-button img {
-      width: 24px;
-      height: 24px;
-    }
-    #filter-panel {
-      position: fixed;
-      top: 20%;
-      left: 50%;
-      transform: translateX(-50%);
-      background: white;
-      border: 1px solid #ccc;
-      border-radius: 6px;
-      padding: 10px;
-      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
-      z-index: 1000;
-      display: none;
-      max-height: 300px;
-      overflow-y: auto;
-      width: 280px;
-    }
-    .filter-controls {
-      display: flex;
-      justify-content: space-between;
-      margin-bottom: 8px;
-    }
-    .filter-controls button {
-      font-size: 12px;
-      padding: 4px 8px;
-      cursor: pointer;
-      background-color: #f0f0f0;
-      border: 1px solid #ccc;
-      border-radius: 4px;
-    }
-    #filter-panel label {
-      display: block;
-      font-size: 12px;
-      margin: 4px 0;
-      color: #333;
-    }
-    #filter-panel input[type="checkbox"] {
-      accent-color: #777;
-      margin-right: 6px;
-    }
   </style>
 </head>
 <body>
-  <div id="loading"><div class="loader"></div>現在、マップを読み込んでいます...</div>
+  <div class="loader" id="loader">
+    <div class="spinner"></div>
+    <div>マップを読み込んでいます...</div>
+  </div>
   <div id="map"></div>
-
-  <div class="floating-buttons">
-    <button class="circle-button" title="現在地">
-      <img src="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/icons/geo-alt.svg" alt="現在地">
-    </button>
-    <button class="circle-button" title="ジャンルで探す" id="filter-button">
-      <img src="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/icons/search.svg" alt="ジャンル検索">
-    </button>
-    <button class="circle-button" title="エリアで探す">
-      <img src="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/icons/map.svg" alt="エリア検索">
-    </button>
-    <button class="circle-button" title="シーンで探す">
-      <img src="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/icons/person.svg" alt="シーン検索">
-    </button>
-  </div>
-
-  <div id="filter-panel">
-    <h4 style="margin-top: 0; font-size: 14px; text-align: center;">ジャンルからお店を探す</h4>
-    <div class="filter-controls">
-      <button id="select-all">すべて選択</button>
-      <button id="deselect-all">選択解除</button>
+  <div class="filter-panel" id="genre-filter">
+    <h3>ジャンルからお店を探す</h3>
+    <div class="filter-actions">
+      <button onclick="selectAllGenres()">すべて選択</button>
+      <button onclick="clearAllGenres()">選択解除</button>
     </div>
+    <label><input type="checkbox" value="イタリアン" checked />イタリアン</label>
+    <label><input type="checkbox" value="カフェ" checked />カフェ</label>
+    <label><input type="checkbox" value="ビストロ" checked />ビストロ</label>
   </div>
-
+  <div class="control-buttons">
+    <div class="control-button" title="現在地"><img src="https://img.icons8.com/ios-filled/24/000000/marker.png" alt="現在地"></div>
+    <div class="control-button" title="ジャンルで探す"><img src="https://img.icons8.com/ios-filled/24/000000/search--v1.png" alt="検索"></div>
+    <div class="control-button" title="エリアで探す"><img src="https://img.icons8.com/ios-filled/24/000000/map.png" alt="マップ"></div>
+    <div class="control-button" title="シーンで探す"><img src="https://img.icons8.com/ios-filled/24/000000/user.png" alt="シーン"></div>
+  </div>
   <script>
-    let activeInfoWindow;
-    let allMarkers = [];
+    const loader = document.getElementById('loader');
+    window.addEventListener('load', () => {
+      loader.style.display = 'none';
+    });
 
-    document.getElementById('filter-button').onclick = () => {
-      const panel = document.getElementById('filter-panel');
-      panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
-    };
+    function selectAllGenres() {
+      document.querySelectorAll('#genre-filter input[type="checkbox"]').forEach(cb => cb.checked = true);
+    }
 
-    async function initMap() {
-      const map = new google.maps.Map(document.getElementById("map"), {
-        zoom: 14,
-        center: { lat: 34.746, lng: 135.359 },
-      });
-
-      try {
-        const response = await fetch("https://script.google.com/macros/s/AKfycbwJNFpp9H0C6U2E1-Q51ysBZQciBded-DVcMZWa5bgqLyx7P3JKVLRarGJkwxnOo-hy/exec");
-        const mapData = await response.json();
-
-        const genreSet = new Set();
-        mapData.forEach(p => {
-          [p['ジャンル1'], p['ジャンル2'], p['ジャンル3']].forEach(j => j && genreSet.add(j));
-        });
-
-        const genreList = Array.from(genreSet).sort();
-
-        const filterPanel = document.getElementById("filter-panel");
-        genreList.forEach(genre => {
-          const label = document.createElement("label");
-          const checkbox = document.createElement("input");
-          checkbox.type = "checkbox";
-          checkbox.checked = true;
-          checkbox.value = genre;
-          checkbox.className = "genre-check";
-          checkbox.onchange = () => filterMarkers(mapData);
-          label.appendChild(checkbox);
-          label.append(" " + genre);
-          filterPanel.appendChild(label);
-        });
-
-        document.getElementById("select-all").onclick = () => {
-          document.querySelectorAll('.genre-check').forEach(cb => cb.checked = true);
-          filterMarkers(mapData);
-        };
-
-        document.getElementById("deselect-all").onclick = () => {
-          document.querySelectorAll('.genre-check').forEach(cb => cb.checked = false);
-          filterMarkers(mapData);
-        };
-
-        function filterMarkers(data) {
-          allMarkers.forEach(m => m.setMap(null));
-          allMarkers = [];
-
-          const checkedGenres = Array.from(document.querySelectorAll(".genre-check:checked")).map(c => c.value);
-
-          data.forEach(place => {
-            const genres = [place['ジャンル1'], place['ジャンル2'], place['ジャンル3']];
-            if (!place.緯度 || !place.経度 || !genres.some(g => checkedGenres.includes(g))) return;
-
-            const marker = new google.maps.Marker({
-              position: { lat: parseFloat(place.緯度), lng: parseFloat(place.経度) },
-              map,
-              title: place.店名,
-            });
-
-            const infoWindow = new google.maps.InfoWindow({
-              content: `
-                <strong>${place.店名}</strong><br>
-                ${place.アクセス}<br>
-                営業時間: ${place.営業時間}<br>
-                <a href='${place["SNSリンク"]}' class='insta-link' target='_blank' rel='noopener noreferrer'>
-                  <img src='https://upload.wikimedia.org/wikipedia/commons/a/a5/Instagram_icon.png' alt='Instagram'>
-                  Instagram
-                </a>
-              `
-            });
-
-            marker.addListener("click", () => {
-              if (activeInfoWindow) {
-                activeInfoWindow.close();
-              }
-              infoWindow.open(map, marker);
-              activeInfoWindow = infoWindow;
-            });
-
-            allMarkers.push(marker);
-          });
-        }
-
-        filterMarkers(mapData);
-      } catch (error) {
-        console.error("マップデータ取得エラー:", error);
-      } finally {
-        document.getElementById("loading").style.display = "none";
-      }
+    function clearAllGenres() {
+      document.querySelectorAll('#genre-filter input[type="checkbox"]').forEach(cb => cb.checked = false);
     }
   </script>
-
-  <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCXxn4fLU6ns7JcbfxUAn9KFOA7ts86LBM&callback=initMap"></script>
+  <script async defer src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY&callback=initMap"></script>
 </body>
 </html>
