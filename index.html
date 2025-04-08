@@ -39,24 +39,24 @@
         center: { lat: 34.746, lng: 135.359 },
       });
 
-      const response = await fetch("https://script.google.com/macros/s/AKfycbw0Q-YEkBPQ3v6lMiFKOjIDy9wGwqQpWTsXZvQd_z6qM-z4EfCXH69Ds5m8CvsI-fI1/exec");
+      const response = await fetch("https://script.google.com/macros/s/AKfycbwJNFpp9H0C6U2E1-Q51ysBZQciBded-DVcMZWa5bgqLyx7P3JKVLRarGJkwxnOo-hy/exec");
       const mapData = await response.json();
 
       mapData.forEach(place => {
-        if (!place.lat || !place.lng) return;
+        if (!place.緯度 || !place.経度) return;
 
         const marker = new google.maps.Marker({
-          position: { lat: parseFloat(place.lat), lng: parseFloat(place.lng) },
+          position: { lat: parseFloat(place.緯度), lng: parseFloat(place.経度) },
           map,
-          title: place.name,
+          title: place.店名,
         });
 
         const infoWindow = new google.maps.InfoWindow({
           content: `
-            <strong>${place.name}</strong><br>
-            ${place.access}<br>
-            営業時間: ${place.time}<br>
-            <a href='${place.sns}' class='insta-link' target='_blank' rel='noopener noreferrer'>
+            <strong>${place.店名}</strong><br>
+            ${place.アクセス}<br>
+            営業時間: ${place.営業時間}<br>
+            <a href='${place["SNSリンク"]}' class='insta-link' target='_blank' rel='noopener noreferrer'>
               <img src='https://upload.wikimedia.org/wikipedia/commons/a/a5/Instagram_icon.png' alt='Instagram'>
               Instagram
             </a>
