@@ -8,9 +8,6 @@
       height: 100vh;
       width: 100%;
     }
-    .gm-style-iw {
-      max-width: 250px;
-    }
     body {
       margin: 0;
       font-family: sans-serif;
@@ -41,41 +38,22 @@
       background: white;
       border: none;
       border-radius: 50%;
-      width: 48px;
-      height: 48px;
+      width: 56px;
+      height: 56px;
       box-shadow: 0 2px 6px rgba(0,0,0,0.3);
       cursor: pointer;
       display: flex;
       align-items: center;
       justify-content: center;
+      transition: background 0.2s;
     }
-    .filter-panel {
-      position: fixed;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      background: white;
-      border-radius: 12px;
-      padding: 16px;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.2);
-      z-index: 1001;
-      max-width: 90%;
+    .map-controls button:hover {
+      background: #f0f0f0;
     }
-    .filter-panel h3 {
-      margin-top: 0;
-      font-size: 1rem;
-    }
-    .filter-panel label {
-      display: block;
-      margin-bottom: 8px;
-    }
-    .filter-panel input[type="checkbox"] {
-      accent-color: black;
-    }
-    .filter-panel .actions {
-      display: flex;
-      justify-content: space-between;
-      margin-bottom: 12px;
+    .map-controls svg {
+      width: 24px;
+      height: 24px;
+      fill: #333;
     }
     @media (max-width: 600px) {
       .map-controls {
@@ -90,10 +68,27 @@
   <div class="loading-overlay" id="loading">現在、マップを読み込んでいます...</div>
 
   <div class="map-controls">
-    <button id="locateBtn"><img src="https://img.icons8.com/ios-filled/24/000000/navigation.png" alt="現在地"></button>
-    <button id="genreBtn"><img src="https://img.icons8.com/ios-glyphs/24/000000/restaurant.png" alt="ジャンル"></button>
-    <button id="areaBtn"><img src="https://img.icons8.com/ios-glyphs/24/000000/map.png" alt="エリア"></button>
-    <button id="sceneBtn"><img src="https://img.icons8.com/ios-glyphs/24/000000/user.png" alt="シーン"></button>
+    <button id="locateBtn" title="現在地">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" class="bi bi-geo-alt">
+        <path d="M8 16s6-5.686 6-10A6 6 0 0 0 2 6c0 4.314 6 10 6 10zm0-7a3 3 0 1 1 0-6 3 3 0 0 1 0 6z"/>
+      </svg>
+    </button>
+    <button id="genreBtn" title="ジャンルで探す">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" class="bi bi-search">
+        <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85zm-5.242.656a5 5 0 1 1 0-10 5 5 0 0 1 0 10z"/>
+      </svg>
+    </button>
+    <button id="areaBtn" title="エリアで探す">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" class="bi bi-map">
+        <path d="M15.817.113A.5.5 0 0 1 16 .5v14a.5.5 0 0 1-.683.474L10 13.118l-5.317 1.856A.5.5 0 0 1 4 14.5V1.118L9.317.262a.5.5 0 0 1 .366 0l6.134 2.12zM10 1.882 5 3.618v10.5l5-1.736V1.882zm1 0v10.5l4 1.382V2.264L11 1.882z"/>
+      </svg>
+    </button>
+    <button id="sceneBtn" title="シーンで探す">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" class="bi bi-person">
+        <path d="M8 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm4-3a4 4 0 1 1-8 0 4 4 0 0 1 8 0z"/>
+        <path d="M14 14s-1-1.5-6-1.5S2 14 2 14v1h12v-1z"/>
+      </svg>
+    </button>
   </div>
 
   <script>
