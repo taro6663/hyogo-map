@@ -55,7 +55,7 @@
     }
     .floating-buttons {
       position: fixed;
-      bottom: 20px;
+      bottom: 100px;
       right: 20px;
       display: flex;
       flex-direction: column;
@@ -78,6 +78,45 @@
       width: 24px;
       height: 24px;
     }
+    #filter-panel {
+      position: fixed;
+      top: 20%;
+      left: 50%;
+      transform: translateX(-50%);
+      background: white;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      padding: 10px;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+      z-index: 1000;
+      display: none;
+      max-height: 300px;
+      overflow-y: auto;
+      width: 280px;
+    }
+    .filter-controls {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 8px;
+    }
+    .filter-controls button {
+      font-size: 12px;
+      padding: 4px 8px;
+      cursor: pointer;
+      background-color: #f0f0f0;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+    #filter-panel label {
+      display: block;
+      font-size: 12px;
+      margin: 4px 0;
+      color: #333;
+    }
+    #filter-panel input[type="checkbox"] {
+      accent-color: #777;
+      margin-right: 6px;
+    }
   </style>
 </head>
 <body>
@@ -99,8 +138,8 @@
     </button>
   </div>
 
-  <div id="filter-panel" style="position: absolute; top: 60px; right: 80px; background: white; border: 1px solid #ccc; border-radius: 6px; padding: 10px; box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2); z-index: 1000; display: none; max-height: 300px; overflow-y: auto;">
-    <div class="filter-controls" style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+  <div id="filter-panel">
+    <div class="filter-controls">
       <button id="select-all">すべて選択</button>
       <button id="deselect-all">選択解除</button>
       <button id="favorite-only">
