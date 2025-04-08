@@ -71,32 +71,44 @@
       0% { transform: rotate(0deg); }
       100% { transform: rotate(360deg); }
     }
-    .search-bar {
+    .filter-panel {
       position: fixed;
-      top: 16px;
+      top: 50%;
       left: 50%;
-      transform: translateX(-50%);
+      transform: translate(-50%, -50%);
       background: white;
-      border-radius: 24px;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.2);
-      padding: 8px 16px;
+      padding: 16px 20px 20px;
+      border-radius: 12px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+      z-index: 2000;
+      display: none;
+      min-width: 280px;
+      max-width: 90%;
+    }
+    .filter-panel h3 {
+      margin: 0 0 12px;
+      font-size: 1rem;
+    }
+    .filter-panel label {
+      display: block;
+      margin-bottom: 8px;
+    }
+    .filter-panel input[type="checkbox"] {
+      accent-color: black;
+    }
+    .filter-panel .actions {
       display: flex;
-      align-items: center;
-      z-index: 1000;
-      width: 90%;
-      max-width: 400px;
+      justify-content: space-between;
+      margin-bottom: 12px;
     }
-    .search-bar input {
+    .filter-panel .close-btn {
+      position: absolute;
+      top: 8px;
+      right: 10px;
+      background: transparent;
       border: none;
-      outline: none;
-      font-size: 14px;
-      flex-grow: 1;
-    }
-    .search-bar svg {
-      width: 18px;
-      height: 18px;
-      margin-right: 8px;
-      fill: #555;
+      font-size: 18px;
+      cursor: pointer;
     }
   </style>
 </head>
@@ -107,15 +119,27 @@
     <span>マップを読み込んでいます...</span>
   </div>
 
-  <div class="search-bar">
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16"><path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85zm-5.242.656a5 5 0 1 1 0-10 5 5 0 0 1 0 10z"/></svg>
-    <input type="text" id="searchInput" placeholder="店名・ジャンル・駅名で探す...">
-  </div>
-
   <div class="map-controls">
     <button id="locateBtn" title="現在地">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16"><path d="M8 16s6-5.686 6-10A6 6 0 0 0 2 6c0 4.314 6 10 6 10zm0-7a3 3 0 1 1 0-6 3 3 0 0 1 0 6z"/></svg>
     </button>
+    <button id="genreBtn" title="ジャンルで探す">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16"><path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85zm-5.242.656a5 5 0 1 1 0-10 5 5 0 0 1 0 10z"/></svg>
+    </button>
+  </div>
+
+  <div id="genreFilterPanel" class="filter-panel">
+    <button class="close-btn" onclick="document.getElementById('genreFilterPanel').style.display='none'">×</button>
+    <h3>ジャンルからお店を探す</h3>
+    <div class="actions">
+      <button onclick="selectAllGenres(true)">すべて選択</button>
+      <button onclick="selectAllGenres(false)">選択解除</button>
+    </div>
+    <div id="genreCheckboxes">
+      <label><input type="checkbox" value="イタリアン" checked> イタリアン</label>
+      <label><input type="checkbox" value="ビストロ" checked> ビストロ</label>
+      <label><input type="checkbox" value="カフェ" checked> カフェ</label>
+    </div>
   </div>
 
   <script>
@@ -169,14 +193,16 @@
       }
     });
 
-    document.getElementById("searchInput").addEventListener("input", (e) => {
-      const keyword = e.target.value.trim().toLowerCase();
-      markers.forEach(({ marker, place }) => {
-        const fields = ["店名", "ジャンル1", "ジャンル2", "ジャンル3", "最寄り駅", "沿線"];
-        const visible = fields.some(field => place[field] && place[field].toLowerCase().includes(keyword));
-        marker.setVisible(visible);
-      });
+    document.getElementById("genreBtn").addEventListener("click", () => {
+      const panel = document.getElementById("genreFilterPanel");
+      panel.style.display = panel.style.display === "block" ? "none" : "block";
     });
+
+    function selectAllGenres(flag) {
+      document.querySelectorAll('#genreCheckboxes input[type="checkbox"]').forEach(cb => {
+        cb.checked = flag;
+      });
+    }
 
     window.initMap = initMap;
   </script>
