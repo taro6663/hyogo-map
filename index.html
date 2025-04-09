@@ -27,24 +27,15 @@
     .map-controls button {
       background: white;
       border: none;
-      border-radius: 50%;
-      width: 56px;
-      height: 56px;
+      border-radius: 12px;
+      padding: 8px 12px;
       box-shadow: 0 2px 6px rgba(0,0,0,0.3);
       cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
       transition: background 0.2s;
+      font-size: 14px;
     }
     .map-controls button:hover {
       background: #f0f0f0;
-    }
-    .map-controls svg {
-      width: 28px;
-      height: 28px;
-      fill: #333;
-      vertical-align: middle;
     }
     .loading-overlay {
       position: fixed;
@@ -119,7 +110,19 @@
       margin-bottom: 4px;
     }
     .filter-panel {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: white;
+      padding: 16px;
+      border-radius: 12px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+      z-index: 1100;
       display: none;
+    }
+    .filter-panel h3 {
+      margin-top: 0;
     }
   </style>
 </head>
@@ -131,11 +134,9 @@
   </div>
 
   <div class="map-controls">
-    <button id="locateBtn" title="現在地">
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16"><path d="M8 16s6-5.686 6-10A6 6 0 0 0 2 6c0 4.314 6 10 6 10zm0-7a3 3 0 1 1 0-6 3 3 0 0 1 0 6z"/></svg>
-    </button>
-    <button id="genreBtn" title="ジャンルで探す">ジャンル</button>
-    <button id="areaBtn" title="地域で探す">地域</button>
+    <button id="locateBtn">現在地</button>
+    <button id="genreBtn">ジャンル</button>
+    <button id="areaBtn">地域</button>
   </div>
 
   <div class="store-toggle" id="storeToggle">店舗一覧を開く</div>
@@ -145,14 +146,16 @@
   </div>
 
   <div id="genreFilterPanel" class="filter-panel">
-    <label><input type="checkbox" value="イタリアン" checked> イタリアン</label>
-    <label><input type="checkbox" value="ビストロ" checked> ビストロ</label>
+    <h3>ジャンルで絞り込み</h3>
+    <label><input type="checkbox" value="イタリアン" checked> イタリアン</label><br>
+    <label><input type="checkbox" value="ビストロ" checked> ビストロ</label><br>
     <label><input type="checkbox" value="カフェ" checked> カフェ</label>
   </div>
 
   <div id="areaFilterPanel" class="filter-panel">
-    <label><input type="checkbox" value="西宮北口" checked> 西宮北口</label>
-    <label><input type="checkbox" value="三宮" checked> 三宮</label>
+    <h3>地域で絞り込み</h3>
+    <label><input type="checkbox" value="西宮北口" checked> 西宮北口</label><br>
+    <label><input type="checkbox" value="三宮" checked> 三宮</label><br>
     <label><input type="checkbox" value="明石" checked> 明石</label>
   </div>
 
@@ -175,7 +178,7 @@
         title: place.店名,
       });
       const infoWindow = new google.maps.InfoWindow({
-        content: `<strong>${place.店名}</strong><br>${place.アクセス}<br>営業時間: ${place.営業時間}<br><a href='${place["SNSリンク"]}' target='_blank'><img src='https://simpleicons.org/icons/instagram.svg' alt='Instagram' width='16' height='16' style='vertical-align:middle; margin-right:4px; filter: grayscale(100%);'>Instagram</a>`
+        content: `<strong>${place.店名}</strong><br>${place.アクセス}<br>営業時間: ${place.営業時間}<br><a href='${place["SNSリンク"]}' target='_blank'><img src='https://simpleicons.org/icons/instagram.svg' width='16' height='16' style='vertical-align:middle; margin-right:4px;'>Instagram</a>`
       });
       marker.addListener("click", () => {
         if (activeInfoWindow) activeInfoWindow.close();
@@ -188,6 +191,7 @@
     function updateMarkerVisibility() {
       const selectedGenres = Array.from(document.querySelectorAll('#genreFilterPanel input[type="checkbox"]:checked')).map(cb => cb.value);
       const selectedAreas = Array.from(document.querySelectorAll('#areaFilterPanel input[type="checkbox"]:checked')).map(cb => cb.value);
+
       const visibleStores = [];
       allMarkers.forEach(({ marker, place }) => {
         const genreMatch = selectedGenres.includes(place.ジャンル1) || selectedGenres.includes(place.ジャンル2) || selectedGenres.includes(place.ジャンル3);
@@ -198,12 +202,11 @@
       });
 
       const container = document.getElementById("storeItems");
-      if (!container) return;
       container.innerHTML = "";
       visibleStores.forEach(place => {
         const div = document.createElement("div");
         div.className = "store-item";
-        div.innerHTML = `<strong>${place.店名}</strong>${place.アクセス}<br>営業時間: ${place.営業時間}`;
+        div.innerHTML = `<strong>${place.店名}</strong>${place.アクセス}<br>${place.営業時間}`;
         container.appendChild(div);
       });
     }
@@ -213,12 +216,10 @@
         zoom: 14,
         center: { lat: 34.746, lng: 135.359 },
       });
-
       const data = await fetchData();
       data.forEach(place => {
         if (place.緯度 && place.経度) createMarker(place);
       });
-
       document.getElementById("loading").style.display = "none";
       updateMarkerVisibility();
     }
@@ -231,9 +232,29 @@
       }
     });
 
+    function hidePanels(exceptId = null) {
+      ['genreFilterPanel', 'areaFilterPanel'].forEach(id => {
+        if (id !== exceptId) document.getElementById(id).style.display = 'none';
+      });
+    }
+
+    document.getElementById("genreBtn").addEventListener("click", () => {
+      const panel = document.getElementById("genreFilterPanel");
+      hidePanels('genreFilterPanel');
+      panel.style.display = panel.style.display === "block" ? "none" : "block";
+    });
+
+    document.getElementById("areaBtn").addEventListener("click", () => {
+      const panel = document.getElementById("areaFilterPanel");
+      hidePanels('areaFilterPanel');
+      panel.style.display = panel.style.display === "block" ? "none" : "block";
+    });
+
     document.getElementById("storeToggle").addEventListener("click", () => {
-      const list = document.getElementById("storeList");
-      list.classList.toggle("open");
+      const storeList = document.getElementById("storeList");
+      const visible = storeList.classList.toggle("open");
+      hidePanels();
+      updateMarkerVisibility();
     });
 
     document.querySelectorAll('#genreFilterPanel input[type="checkbox"], #areaFilterPanel input[type="checkbox"]').forEach(cb => {
