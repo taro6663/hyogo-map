@@ -83,6 +83,24 @@
       overflow-y: scroll;
       z-index: 1000;
       box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.2);
+      transform: translateY(100%);
+      transition: transform 0.3s ease;
+    }
+    .store-list.open {
+      transform: translateY(0);
+    }
+    .store-toggle {
+      position: fixed;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #333;
+      color: white;
+      padding: 8px 16px;
+      border-radius: 12px 12px 0 0;
+      z-index: 1001;
+      cursor: pointer;
+      font-size: 14px;
     }
     .store-list h4 {
       margin: 0 0 12px;
@@ -99,6 +117,9 @@
       font-size: 1rem;
       display: block;
       margin-bottom: 4px;
+    }
+    .filter-panel {
+      display: none;
     }
   </style>
 </head>
@@ -117,9 +138,22 @@
     <button id="areaBtn" title="地域で探す">地域</button>
   </div>
 
-  <div id="storeList" class="store-list" style="display:none">
+  <div class="store-toggle" id="storeToggle">店舗一覧を開く</div>
+  <div id="storeList" class="store-list">
     <h4>表示中の店舗</h4>
     <div id="storeItems"></div>
+  </div>
+
+  <div id="genreFilterPanel" class="filter-panel">
+    <label><input type="checkbox" value="イタリアン" checked> イタリアン</label>
+    <label><input type="checkbox" value="ビストロ" checked> ビストロ</label>
+    <label><input type="checkbox" value="カフェ" checked> カフェ</label>
+  </div>
+
+  <div id="areaFilterPanel" class="filter-panel">
+    <label><input type="checkbox" value="西宮北口" checked> 西宮北口</label>
+    <label><input type="checkbox" value="三宮" checked> 三宮</label>
+    <label><input type="checkbox" value="明石" checked> 明石</label>
   </div>
 
   <script>
@@ -152,10 +186,15 @@
     }
 
     function updateMarkerVisibility() {
+      const selectedGenres = Array.from(document.querySelectorAll('#genreFilterPanel input[type="checkbox"]:checked')).map(cb => cb.value);
+      const selectedAreas = Array.from(document.querySelectorAll('#areaFilterPanel input[type="checkbox"]:checked')).map(cb => cb.value);
       const visibleStores = [];
       allMarkers.forEach(({ marker, place }) => {
-        marker.setVisible(true);
-        visibleStores.push(place);
+        const genreMatch = selectedGenres.includes(place.ジャンル1) || selectedGenres.includes(place.ジャンル2) || selectedGenres.includes(place.ジャンル3);
+        const areaMatch = selectedAreas.includes(place.最寄り駅);
+        const visible = genreMatch && areaMatch;
+        marker.setVisible(visible);
+        if (visible) visibleStores.push(place);
       });
 
       const container = document.getElementById("storeItems");
@@ -167,10 +206,6 @@
         div.innerHTML = `<strong>${place.店名}</strong>${place.アクセス}<br>営業時間: ${place.営業時間}`;
         container.appendChild(div);
       });
-      const storeList = document.getElementById("storeList");
-      if (storeList) {
-        storeList.style.display = visibleStores.length > 0 ? 'block' : 'none';
-      }
     }
 
     async function initMap() {
@@ -194,6 +229,15 @@
           map.setCenter({ lat: pos.coords.latitude, lng: pos.coords.longitude });
         });
       }
+    });
+
+    document.getElementById("storeToggle").addEventListener("click", () => {
+      const list = document.getElementById("storeList");
+      list.classList.toggle("open");
+    });
+
+    document.querySelectorAll('#genreFilterPanel input[type="checkbox"], #areaFilterPanel input[type="checkbox"]').forEach(cb => {
+      cb.addEventListener('change', updateMarkerVisibility);
     });
 
     window.initMap = initMap;
