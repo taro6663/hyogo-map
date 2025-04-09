@@ -73,30 +73,32 @@
     }
     .store-list {
       position: fixed;
-      left: 16px;
-      bottom: 16px;
+      left: 0;
+      right: 0;
+      bottom: 0;
       background: white;
       padding: 12px;
-      border-radius: 8px;
+      border-radius: 12px 12px 0 0;
       max-height: 50vh;
-      overflow-y: auto;
-      width: 280px;
+      overflow-y: scroll;
       z-index: 1000;
-      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+      box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.2);
     }
     .store-list h4 {
-      margin: 0 0 8px;
+      margin: 0 0 12px;
+      padding-left: 8px;
     }
     .store-item {
-      margin-bottom: 8px;
-      border-bottom: 1px solid #ddd;
-      padding-bottom: 6px;
-    }
-    .store-item:last-child {
-      border-bottom: none;
+      background: #f9f9f9;
+      border-radius: 8px;
+      padding: 10px;
+      margin-bottom: 12px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
     }
     .store-item strong {
-      font-size: 0.95rem;
+      font-size: 1rem;
+      display: block;
+      margin-bottom: 4px;
     }
   </style>
 </head>
@@ -111,6 +113,8 @@
     <button id="locateBtn" title="現在地">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16"><path d="M8 16s6-5.686 6-10A6 6 0 0 0 2 6c0 4.314 6 10 6 10zm0-7a3 3 0 1 1 0-6 3 3 0 0 1 0 6z"/></svg>
     </button>
+    <button id="genreBtn" title="ジャンルで探す">ジャンル</button>
+    <button id="areaBtn" title="地域で探す">地域</button>
   </div>
 
   <div id="storeList" class="store-list" style="display:none">
@@ -160,7 +164,7 @@
       visibleStores.forEach(place => {
         const div = document.createElement("div");
         div.className = "store-item";
-        div.innerHTML = `<strong>${place.店名}</strong><br>${place.アクセス}<br>${place.営業時間}`;
+        div.innerHTML = `<strong>${place.店名}</strong>${place.アクセス}<br>営業時間: ${place.営業時間}`;
         container.appendChild(div);
       });
       const storeList = document.getElementById("storeList");
